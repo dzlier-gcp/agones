@@ -1,4 +1,4 @@
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,12 @@ project(${PACKAGE_NAME} CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS    "-std=c++11")
-set(CMAKE_CXX_COMPILER g++)
+set(CMAKE_CXX_COMPILER /usr/bin/g++)
+
+#set(AGONES_GRPC_PROVIDER "module" CACHE STRING "Provider of grpc library")
+#set_property(CACHE AGONES_GRPC_PROVIDER PROPERTY STRINGS "module" "package")
+
+include(cmake/grpc.cmake)
 
 add_library(agonessdk SHARED
   sdk.grpc.pb.cc
@@ -35,9 +40,13 @@ add_library(agonessdk SHARED
 
 set_target_properties(agonessdk PROPERTIES LINKER_LANGUAGE CXX)
 
+target_include_directories(agonessdk
+  PRIVATE ${_AGONES_GRPC_INCLUDE_DIR})
+
 target_link_libraries(agonessdk
   ssl
   gpr
+  ${_AGONES_GRPC_LIBRARIES}
   grpc++_unsecure
   grpc++
   grpc_csharp_ext
